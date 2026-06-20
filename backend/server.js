@@ -110,20 +110,88 @@ app.get('/api/games', async (req, res) => {
     }
 });
 
-// API Endpoint to register a new game
+// API Endpoint to register a new game (supports auto-resolving by name or ID)
 app.post('/api/games', async (req, res) => {
-    const { app_id, game_name } = req.body;
-    if (!app_id || !game_name) {
-        return res.status(400).json({ error: 'App ID and Game Name are required' });
+    let { app_id, game_name } = req.body;
+    
+    // If only one field is provided, let's parse it
+    if (!app_id && !game_name) {
+        return res.status(400).json({ error: 'Please provide a Game Name or App ID' });
     }
+
     try {
-        await pool.query(
-            'INSERT INTO games (app_id, game_name) VALUES ($1, $2) ON CONFLICT (app_id) DO NOTHING;',
-            [parseInt(app_id), game_name]
+        // If app_id is not provided but game_name is, search Steam to resolve the app_id
+        if (!app_id && game_name) {
+            // Check if game_name is actually a number (the user entered the ID in the name field)
+            if (/^\d+$/.test(game_name.trim())) {
+                app_id = parseInt(game_name.trim());
+                game_name = null;
+            } else {
+                console.log(`🔎 Resolving App ID for game name: "${game_name}"...`);
+                const searchUrl = `https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(game_name)}&l=english&cc=US`;
+                const searchResponse = await fetch(searchUrl, {
+                    headers: { 'User-Agent': 'Mozilla/5.0' }
+                });
+                
+                if (searchResponse.ok) {
+                    const searchData = await searchResponse.json();
+                    if (searchData.items && searchData.items.length > 0) {
+                        // Find the first item of type 'app'
+                        const bestMatch = searchData.items.find(item => item.type === 'app') || searchData.items[0];
+                        app_id = bestMatch.id;
+                        game_name = bestMatch.name;
+                        console.log(`✅ Resolved: "${game_name}" -> App ID: ${app_id}`);
+                    } else {
+                        return res.status(404).json({ error: `Could not find any Steam game matching "${game_name}"` });
+                    }
+                } else {
+                    return res.status(500).json({ error: 'Failed to query Steam Search API' });
+                }
+            }
+        }
+
+        // If app_id is provided but game_name is not, resolve the name from Steam using appdetails
+        if (app_id && !game_name) {
+            app_id = parseInt(app_id);
+            console.log(`🔎 Resolving game name for App ID: ${app_id}...`);
+            const detailsUrl = `https://store.steampowered.com/api/appdetails?appids=${app_id}&l=english`;
+            const response = await fetch(detailsUrl, {
+                headers: { 'User-Agent': 'Mozilla/5.0' }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data[app_id] && data[app_id].success && data[app_id].data) {
+                    game_name = data[app_id].data.name;
+                    console.log(`✅ Resolved: App ID ${app_id} -> "${game_name}"`);
+                } else {
+                    return res.status(404).json({ error: `Could not find a valid Steam game for App ID ${app_id}` });
+                }
+            } else {
+                game_name = `Steam App ${app_id}`;
+            }
+        }
+
+        // Clean values
+        app_id = parseInt(app_id);
+        game_name = game_name.trim();
+
+        // Insert into database
+        const insertResult = await pool.query(
+            'INSERT INTO games (app_id, game_name) VALUES ($1, $2) ON CONFLICT (app_id) DO NOTHING RETURNING *;',
+            [app_id, game_name]
         );
-        res.status(201).json({ success: true });
+        
+        if (insertResult.rows.length === 0) {
+            // Already exists, fetch name to reply
+            const existing = await pool.query('SELECT game_name FROM games WHERE app_id = $1;', [app_id]);
+            const resolvedName = existing.rows[0] ? existing.rows[0].game_name : game_name;
+            return res.status(200).json({ success: true, app_id, game_name: resolvedName, message: 'Game already registered' });
+        }
+
+        res.status(201).json({ success: true, app_id, game_name });
     } catch (err) {
-        console.error("❌ Database Query Error:", err.message);
+        console.error("❌ Database/API Resolution Error:", err.message);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

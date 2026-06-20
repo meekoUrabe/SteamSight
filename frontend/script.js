@@ -487,33 +487,38 @@ function setupRegistryForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const appIdInput = document.getElementById('reg-app-id');
-        const gameNameInput = document.getElementById('reg-game-name');
+        const queryInput = document.getElementById('reg-game-query');
         const feedback = document.getElementById('registration-feedback');
 
-        if (!appIdInput || !gameNameInput || !feedback) return;
+        if (!queryInput || !feedback) return;
 
-        const app_id = appIdInput.value.trim();
-        const game_name = gameNameInput.value.trim();
+        const queryValue = queryInput.value.trim();
 
         feedback.style.display = 'block';
         feedback.style.color = '#ffffff';
         feedback.innerText = '⏳ Registering game...';
 
         try {
+            const bodyData = {};
+            if (/^\d+$/.test(queryValue)) {
+                bodyData.app_id = parseInt(queryValue);
+            } else {
+                bodyData.game_name = queryValue;
+            }
+
             const response = await fetch(`${API_BASE}/api/games`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ app_id, game_name })
+                body: JSON.stringify(bodyData)
             });
 
             const result = await response.json();
 
             if (response.ok && result.success) {
                 feedback.style.color = '#ffffff';
-                feedback.innerText = '✅ Game registered! Scraper will track on next cycle.';
+                feedback.innerText = `✅ Registered: "${result.game_name || queryValue}" (ID: ${result.app_id || 'unresolved'})!`;
                 form.reset();
                 setTimeout(async () => {
                     await loadDashboardData();
