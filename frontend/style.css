@@ -1,0 +1,910 @@
+/* style.css */
+
+/* --------------------------------------------------
+   1. Design Tokens & CSS Variables
+   -------------------------------------------------- */
+:root {
+    /* Color Palette (Minimalist Grayscale Theme) */
+    --color-background: #050505; /* Deep Black background */
+    --color-primary-container: #ffffff; /* Pure White Accent */
+    
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-border-top: rgba(255, 255, 255, 0.12);
+    --glass-border-left: rgba(255, 255, 255, 0.12);
+    
+    /* Surface Colors (greyscale variations) */
+    --color-surface-container-lowest: #000000;
+    --color-surface-container-low: #0a0a0a;
+    --color-surface-container: #111111;
+    --color-surface-container-high: #1a1a1a;
+    --color-surface-container-highest: #262626;
+    --color-surface: #0a0a0a;
+    --color-surface-dim: #0a0a0a;
+    --color-surface-bright: #333333;
+    --color-surface-variant: #262626;
+    
+    /* Typography Colors */
+    --color-on-surface: #ffffff;
+    --color-on-surface-variant: #888888;
+    --color-inverse-surface: #ffffff;
+    --color-inverse-on-surface: #111111;
+    
+    /* Accents & Brand Colors (Greyscale) */
+    --color-primary: #ffffff;
+    --color-on-primary: #000000;
+    --color-on-primary-container: #888888;
+    --color-inverse-primary: #333333;
+    
+    --color-secondary: #cccccc;
+    --color-on-secondary: #111111;
+    --color-secondary-container: #262626;
+    --color-on-secondary-container: #ffffff;
+    
+    --color-tertiary: #dddddd;
+    --color-on-tertiary: #111111;
+    --color-tertiary-container: #333333;
+    --color-on-tertiary-container: #ffffff;
+    
+    /* Outline Colors */
+    --color-outline: #555555;
+    --color-outline-variant: #333333;
+    
+    /* Semantic Status Colors */
+    --color-error: #ffffff;
+    --color-on-error: #000000;
+    --color-error-container: #333333;
+    --color-on-error-container: #ffffff;
+    
+    /* Fixed Accents */
+    --color-primary-fixed: #ffffff;
+    --color-primary-fixed-dim: #cccccc;
+    --color-on-primary-fixed: #000000;
+    --color-on-primary-fixed-variant: #555555;
+    
+    /* Border Radius */
+    --radius-sm: 0.125rem;
+    --radius-default: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-full: 9999px;
+
+    /* Spacing System */
+    --spacing-unit: 4px;
+    --spacing-gutter: 24px;
+    --spacing-margin-desktop: 40px;
+    --spacing-margin-mobile: 16px;
+    --spacing-panel-padding: 24px;
+}
+
+/* --------------------------------------------------
+   2. Base Reset (Tailwind-like Reset)
+   -------------------------------------------------- */
+*, ::before, ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: currentColor;
+}
+
+html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -moz-tab-size: 4;
+    tab-size: 4;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    line-height: inherit;
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+}
+
+body::selection {
+    background-color: rgba(0, 229, 255, 0.3); /* selection:bg-primary-container/30 */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+    margin: 0;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+}
+
+img, svg {
+    display: block;
+    vertical-align: middle;
+}
+
+/* --------------------------------------------------
+   3. Mesh Background Orbs
+   -------------------------------------------------- */
+.bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: transparent;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.orb-1 {
+    width: 600px;
+    height: 600px;
+    background: #ffffff;
+    top: -10%;
+    left: -5%;
+    opacity: 0.03;
+}
+
+.orb-2 {
+    width: 800px;
+    height: 800px;
+    background: #ffffff;
+    bottom: -20%;
+    right: -10%;
+    opacity: 0.02;
+}
+
+.orb-3 {
+    width: 500px;
+    height: 500px;
+    background: #ffffff;
+    top: 30%;
+    right: 20%;
+    opacity: 0.01;
+}
+
+/* --------------------------------------------------
+   4. Glassmorphism Panels (.glass-panel)
+   -------------------------------------------------- */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border-top);
+    border-left: 1px solid var(--glass-border-left);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+/* --------------------------------------------------
+   5. SideNavBar (.sidebar-nav)
+   -------------------------------------------------- */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--spacing-panel-padding);
+    padding-bottom: var(--spacing-panel-padding);
+    z-index: 50;
+    /* Reset borders for sidebar layout, it only needs border-right separator */
+    border: none !important;
+    border-right: 1px solid var(--glass-border) !important;
+}
+
+.sidebar-header {
+    padding-left: var(--spacing-gutter);
+    padding-right: var(--spacing-gutter);
+    margin-bottom: 2.5rem; /* mb-10 */
+}
+
+.sidebar-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32px;
+    color: var(--color-primary-container);
+    letter-spacing: -0.05em;
+}
+
+.sidebar-subtitle {
+    color: var(--color-on-surface-variant);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+}
+
+.nav-menu {
+    flex: 1 1 0%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--color-on-surface-variant);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--color-on-surface);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--color-primary-container);
+    font-weight: 700;
+    border-left: 4px solid var(--color-primary-container);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.nav-link span:not(.material-symbols-outlined) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.05em;
+}
+
+.nav-link .material-symbols-outlined {
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.nav-link.active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+}
+
+.sidebar-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-top: auto;
+}
+
+.profile-card {
+    padding: 1rem;
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.profile-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info {
+    min-width: 0; /* allows text truncation to work inside flexbox */
+}
+
+.profile-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-role {
+    font-size: 10px;
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+/* --------------------------------------------------
+   6. TopNavBar (.dashboard-header)
+   -------------------------------------------------- */
+.dashboard-header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 280px;
+    height: 4rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: var(--spacing-gutter);
+    padding-right: var(--spacing-gutter);
+    z-index: 40;
+}
+
+.header-title-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-title-container .material-symbols-outlined {
+    color: var(--color-primary-container);
+    font-size: 24px;
+}
+
+.header-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32px;
+    color: var(--color-primary-container);
+}
+
+.header-actions-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-on-surface);
+    font-size: 0.875rem;
+    width: 16rem;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    transition: all 0.3s ease;
+    border-radius: var(--radius-sm);
+}
+
+.search-input:focus {
+    outline: none;
+    border-bottom: 1px solid var(--color-primary-container);
+}
+
+.search-input::placeholder {
+    color: rgba(186, 201, 204, 0.5);
+}
+
+.search-icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-on-surface-variant);
+    font-size: 1.125rem;
+    pointer-events: none;
+}
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action-button {
+    color: var(--color-on-surface-variant);
+    position: relative;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.95);
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    color: var(--color-primary-container);
+}
+
+.action-button:active {
+    transform: scale(0.9);
+}
+
+.action-button .material-symbols-outlined {
+    font-size: 24px;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: var(--color-primary-container);
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* --------------------------------------------------
+   7. Main Container (.main-container)
+   -------------------------------------------------- */
+.main-content {
+    margin-left: 280px;
+    padding-top: 6rem; /* pt-24 */
+    padding-left: var(--spacing-gutter);
+    padding-right: var(--spacing-gutter);
+    padding-bottom: 2.5rem; /* pb-10 */
+    min-height: 100vh;
+    max-width: 1600px;
+    width: calc(100% - 280px);
+}
+
+/* --------------------------------------------------
+   8. KPI Dashboard Grid (.kpi-grid, .kpi-card)
+   -------------------------------------------------- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    padding: var(--spacing-panel-padding);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-icon-bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+
+.kpi-card:hover .kpi-icon-bg {
+    opacity: 0.2;
+}
+
+.kpi-icon-bg .material-symbols-outlined {
+    font-size: 3rem;
+}
+
+.kpi-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    color: var(--color-on-surface-variant);
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+.kpi-value-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.kpi-value {
+    font-family: 'Geist', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-on-surface);
+    margin: 0;
+}
+
+.kpi-trend {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-trend.up {
+    color: var(--color-primary-container);
+}
+
+.kpi-trend.down {
+    color: var(--color-error);
+}
+
+.kpi-trend.steady {
+    color: var(--color-on-surface-variant);
+}
+
+.kpi-trend-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    margin-left: 0.25rem;
+    font-weight: 500;
+}
+
+/* --------------------------------------------------
+   9. Analytics Panel & Chart (.analytics-panel)
+   -------------------------------------------------- */
+.analytics-panel {
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.panel-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+    .panel-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.panel-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    color: var(--color-on-surface);
+    margin-bottom: 0.25rem;
+}
+
+.panel-subtitle {
+    color: var(--color-on-surface-variant);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    margin: 0;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.375rem 1rem;
+    border-radius: var(--radius-full);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    color: var(--color-on-surface-variant);
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    color: var(--color-on-surface);
+}
+
+.tab-btn.active {
+    color: var(--color-primary-container);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.chart-container {
+    height: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.chart-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.chart-grid-line {
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 1;
+}
+
+.chart-line-main {
+    stroke: #ffffff;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    fill: none;
+}
+
+.chart-tooltip {
+    position: absolute;
+    top: 5rem;
+    left: 260px;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+}
+
+.tooltip-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 16px;
+    color: var(--color-primary-container);
+    margin-bottom: 0.25rem;
+    margin-top: 0;
+}
+
+.tooltip-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.tooltip-meta {
+    font-size: 10px;
+    color: var(--color-on-surface-variant);
+    margin: 0;
+}
+
+/* --------------------------------------------------
+   10. Recent Telemetry Table (.table-panel, etc.)
+   -------------------------------------------------- */
+.table-panel {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.table-header-bar {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.export-btn {
+    color: var(--color-primary-container);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    transition: text-decoration 0.2s;
+}
+
+.export-btn:hover {
+    text-decoration: underline;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+.data-table thead tr {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.data-table th {
+    padding: 1rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+}
+
+.data-table th.text-right {
+    text-align: right;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.data-table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+}
+
+.game-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.game-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-container-high);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.game-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-name {
+    font-weight: 500;
+    color: var(--color-on-surface);
+}
+
+.date-cell {
+    font-size: 0.875rem;
+    color: var(--color-on-surface-variant);
+}
+
+.price-cell {
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+.player-count-cell {
+    font-size: 0.875rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    text-align: right;
+    color: var(--color-primary-container);
+}
+
+.reviews-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+}
+
+.status-indicator.positive {
+    background-color: var(--color-primary-container);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.status-indicator.mixed {
+    background-color: var(--color-on-surface-variant);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.reviews-text {
+    font-size: 0.875rem;
+    color: var(--color-on-surface);
+}
+
+/* --------------------------------------------------
+   11. Utility Classes & Micro-animations
+   -------------------------------------------------- */
+.neon-glow-cyan {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.neon-text-cyan {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+/* Pulse animation for the notification dot */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.85);
+    }
+}
