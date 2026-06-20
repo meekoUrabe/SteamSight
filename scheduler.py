@@ -1,25 +1,25 @@
+import sys
+import os
 import time
 import schedule
-import subprocess
 from datetime import datetime
 
-def run_etl():
-    print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ⚙️ Initiating automated SteamSight ETL pipeline...")
-    # Call the main ETL script
-    subprocess.run(["python", "data_pipeline/clean_data.py"])
-    print("✅ Automated run complete. Sleeping until next cycle...")
+# Add the project root/data_pipeline to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'data_pipeline'))
+from clean_data import load_data_to_db
 
-# Schedule the pipeline to run every 12 hours automatically
+def run_etl():
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ⚙️ Executing ETL inline...")
+    try:
+        load_data_to_db()
+    except Exception as e:
+        print(f"❌ Automation Error: {e}")
+
 schedule.every(12).hours.do(run_etl)
 
 if __name__ == "__main__":
-    print("🕒 SteamSight Automation Daemon Started.")
-    print("The pipeline will now execute automatically every 12 hours.")
-    
-    # Run it once immediately on boot
-    run_etl() 
-    
-    # Keep the script running in the background
+    print("🕒 SteamSight Automation Daemon Started (Native).")
+    run_etl()
     while True:
         schedule.run_pending()
         time.sleep(60)

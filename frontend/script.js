@@ -3,7 +3,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initTelemetryChart();
     await initPricingChart();
     await initReviewsChart();
+    
+    // Load dynamic summary stats in cards
+    await updateDashboardSummary();
 });
+
+async function updateDashboardSummary() {
+    try {
+        // Fetch telemetry to calculate Total Players & Active Games
+        const telResponse = await fetch('http://localhost:5000/api/telemetry');
+        const telData = await telResponse.json();
+        
+        const totalPlayers = telData.reduce((sum, item) => sum + parseInt(item.current_players || 0), 0);
+        const playersEl = document.getElementById('global-players');
+        if (playersEl) {
+            playersEl.innerText = totalPlayers.toLocaleString();
+        }
+
+        const gamesEl = document.getElementById('active-games');
+        if (gamesEl) {
+            gamesEl.innerText = telData.length.toLocaleString();
+        }
+
+        // Fetch reviews to calculate Average Sentiment
+        const revResponse = await fetch('http://localhost:5000/api/reviews');
+        const revData = await revResponse.json();
+        
+        const totalSentimentRatio = revData.reduce((sum, item) => {
+            const pos = parseInt(item.positive_reviews || 0);
+            const neg = parseInt(item.negative_reviews || 0);
+            return sum + (pos + neg > 0 ? (pos / (pos + neg)) : 0);
+        }, 0);
+        
+        const avgSentiment = revData.length > 0 ? Math.round((totalSentimentRatio / revData.length) * 100) : 0;
+        const sentimentEl = document.getElementById('average-sentiment');
+        if (sentimentEl) {
+            sentimentEl.innerText = avgSentiment + '%';
+        }
+    } catch (error) {
+        console.error("❌ Failed to update dashboard summary:", error);
+    }
+}
 
 async function initTelemetryChart() {
     const canvas = document.getElementById('telemetryChart');
