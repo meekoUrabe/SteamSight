@@ -1,7 +1,7 @@
 // API Configuration: Automatically routes locally or points to your production Render backend URL.
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-    : 'https://steamsight-backend.onrender.com'; // CHANGE THIS to your Render backend web service URL.
+    : 'https://steamsight-api.onrender.com';
 
 // Keep track of active Chart.js instances to avoid overlapping rendering bugs
 let telemetryChartInstance = null;
@@ -99,11 +99,11 @@ function renderHistoryChart(data) {
     });
 
     const lineColors = [
-        '#ffffff',                  // Pure White
-        '#cccccc',                  // Light Grey
-        'rgba(255, 255, 255, 0.6)', // Translucent White
-        '#888888',                  // Medium Grey
-        '#444444'                   // Dark Grey
+        '#ffffff',              
+        '#cccccc',               
+        'rgba(255, 255, 255, 0.6)', 
+        '#888888',                 
+        '#444444'                  
     ];
 
     const datasets = [];
