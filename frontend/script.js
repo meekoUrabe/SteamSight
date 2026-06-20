@@ -17,8 +17,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadDashboardData() {
+    // 1. Try to load cached data from localStorage first for instant visual feedback
+    const cachedTel = localStorage.getItem('steamsight_tel');
+    const cachedPricing = localStorage.getItem('steamsight_pricing');
+    const cachedReviews = localStorage.getItem('steamsight_reviews');
+    const cachedHistory = localStorage.getItem('steamsight_history_7');
+    const cachedGames = localStorage.getItem('steamsight_games');
+
+    let hasCache = false;
+    if (cachedTel && cachedPricing && cachedReviews && cachedHistory && cachedGames) {
+        try {
+            const telData = JSON.parse(cachedTel);
+            const pricingData = JSON.parse(cachedPricing);
+            const reviewsData = JSON.parse(cachedReviews);
+            const historyData = JSON.parse(cachedHistory);
+            const allGames = JSON.parse(cachedGames);
+
+            // Render cached data immediately to avoid cold start delay
+            updateDashboardSummary(telData, reviewsData);
+            renderHistoryChart(historyData);
+            renderPricingChart(pricingData);
+            renderReviewsChart(reviewsData);
+            populateTelemetryTable(telData, pricingData, reviewsData, allGames);
+            hasCache = true;
+            console.log("⚡ Loaded cached dashboard data to bypass Render cold start.");
+        } catch (e) {
+            console.error("Failed to parse cached dashboard data:", e);
+        }
+    }
+
     try {
-        // Fetch all telemetry data concurrently (with historical dataset & registered games list)
+        // 2. Fetch fresh data from the server in the background
         const [telResponse, pricingResponse, reviewsResponse, historyResponse, gamesResponse] = await Promise.all([
             fetch(`${API_BASE}/api/telemetry`),
             fetch(`${API_BASE}/api/pricing`),
@@ -33,19 +62,36 @@ async function loadDashboardData() {
         const historyData = await historyResponse.json();
         const allGames = await gamesResponse.json();
 
-        // 1. Update KPI Summary Cards
-        updateDashboardSummary(telData, reviewsData);
+        // 3. Update the cache
+        localStorage.setItem('steamsight_tel', JSON.stringify(telData));
+        localStorage.setItem('steamsight_pricing', JSON.stringify(pricingData));
+        localStorage.setItem('steamsight_reviews', JSON.stringify(reviewsData));
+        localStorage.setItem('steamsight_history_7', JSON.stringify(historyData));
+        localStorage.setItem('steamsight_games', JSON.stringify(allGames));
 
-        // 2. Initialize and render the three charts
+        // 4. Update UI with fresh values
+        updateDashboardSummary(telData, reviewsData);
         renderHistoryChart(historyData);
         renderPricingChart(pricingData);
         renderReviewsChart(reviewsData);
-
-        // 3. Populate Recent Telemetry Data Table (with all games list to support pending statuses)
         populateTelemetryTable(telData, pricingData, reviewsData, allGames);
+        console.log("✅ Dashboard data refreshed and cached.");
 
     } catch (error) {
-        console.error("❌ Failed to load dashboard data:", error);
+        console.error("❌ Failed to load fresh dashboard data:", error);
+        // If there was no cache, show an error message in the table
+        if (!hasCache) {
+            const tbody = document.querySelector('.data-table tbody');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--color-error); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
+                            ❌ Failed to connect to server. Please check connection and try again.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
     }
 }
 
@@ -490,9 +536,18 @@ function setupFilters() {
             else if (text === '7D') days = 7;
             else if (text === '30D') days = 30;
 
+            // Check cache first for instant response
+            const cachedHistory = localStorage.getItem(`steamsight_history_${days}`);
+            if (cachedHistory) {
+                try {
+                    renderHistoryChart(JSON.parse(cachedHistory));
+                } catch (e) {}
+            }
+
             try {
                 const response = await fetch(`${API_BASE}/api/telemetry/history?days=${days}`);
                 const historyData = await response.json();
+                localStorage.setItem(`steamsight_history_${days}`, JSON.stringify(historyData));
                 renderHistoryChart(historyData);
             } catch (err) {
                 console.error("❌ Failed to update history filter:", err);
