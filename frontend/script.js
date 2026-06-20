@@ -18,18 +18,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDashboardData() {
     try {
-        // Fetch all telemetry data concurrently (with historical dataset)
-        const [telResponse, pricingResponse, reviewsResponse, historyResponse] = await Promise.all([
+        // Fetch all telemetry data concurrently (with historical dataset & registered games list)
+        const [telResponse, pricingResponse, reviewsResponse, historyResponse, gamesResponse] = await Promise.all([
             fetch(`${API_BASE}/api/telemetry`),
             fetch(`${API_BASE}/api/pricing`),
             fetch(`${API_BASE}/api/reviews`),
-            fetch(`${API_BASE}/api/telemetry/history?days=7`)
+            fetch(`${API_BASE}/api/telemetry/history?days=7`),
+            fetch(`${API_BASE}/api/games`)
         ]);
 
         const telData = await telResponse.json();
         const pricingData = await pricingResponse.json();
         const reviewsData = await reviewsResponse.json();
         const historyData = await historyResponse.json();
+        const allGames = await gamesResponse.json();
 
         // 1. Update KPI Summary Cards
         updateDashboardSummary(telData, reviewsData);
@@ -39,8 +41,8 @@ async function loadDashboardData() {
         renderPricingChart(pricingData);
         renderReviewsChart(reviewsData);
 
-        // 3. Populate Recent Telemetry Data Table
-        populateTelemetryTable(telData, pricingData, reviewsData);
+        // 3. Populate Recent Telemetry Data Table (with all games list to support pending statuses)
+        populateTelemetryTable(telData, pricingData, reviewsData, allGames);
 
     } catch (error) {
         console.error("❌ Failed to load dashboard data:", error);
@@ -79,7 +81,6 @@ function renderHistoryChart(data) {
     const canvas = document.getElementById('telemetryChart');
     if (!canvas) return;
 
-    // Clean up active chart overlay instances
     if (telemetryChartInstance) {
         telemetryChartInstance.destroy();
     }
@@ -258,7 +259,7 @@ function renderReviewsChart(data) {
     });
 }
 
-function populateTelemetryTable(telData, pricingData, reviewsData) {
+function populateTelemetryTable(telData, pricingData, reviewsData, allGames) {
     const tbody = document.querySelector('.data-table tbody');
     if (!tbody) return;
 
@@ -266,16 +267,27 @@ function populateTelemetryTable(telData, pricingData, reviewsData) {
 
     const merged = {};
     
-    telData.forEach(item => {
-        merged[item.game_name] = {
-            game_name: item.game_name,
-            recorded_at: item.recorded_at,
-            current_players: item.current_players,
+    // Seed all games from registry first to identify pending scraper states
+    allGames.forEach(game => {
+        merged[game.game_name] = {
+            game_name: game.game_name,
+            recorded_at: null,
+            current_players: 0,
             price_usd: 0.0,
             discount_percent: 0,
             positive_reviews: 0,
-            negative_reviews: 0
+            negative_reviews: 0,
+            pending: true
         };
+    });
+
+    // Populate with actual telemetry values if they exist
+    telData.forEach(item => {
+        if (merged[item.game_name]) {
+            merged[item.game_name].recorded_at = item.recorded_at;
+            merged[item.game_name].current_players = item.current_players;
+            merged[item.game_name].pending = false;
+        }
     });
 
     pricingData.forEach(item => {
@@ -300,10 +312,14 @@ function populateTelemetryTable(telData, pricingData, reviewsData) {
         if (game.recorded_at) {
             const dateObj = new Date(game.recorded_at);
             dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } else if (game.pending) {
+            dateStr = 'Awaiting Scrape';
         }
 
         let priceStr = 'Free to Play';
-        if (game.price_usd > 0) {
+        if (game.pending) {
+            priceStr = 'Queued';
+        } else if (game.price_usd > 0) {
             priceStr = `$${game.price_usd.toFixed(2)}`;
             if (game.discount_percent > 0) {
                 priceStr += ` (-${game.discount_percent}%)`;
@@ -317,7 +333,10 @@ function populateTelemetryTable(telData, pricingData, reviewsData) {
         let statusClass = 'mixed';
         let reviewText = 'No Reviews';
         
-        if (total > 0) {
+        if (game.pending) {
+            statusClass = 'mixed';
+            reviewText = 'Pending Telemetry';
+        } else if (total > 0) {
             if (percent >= 80) {
                 statusClass = 'positive';
                 reviewText = `Positive (${percent}%)`;
@@ -330,6 +349,8 @@ function populateTelemetryTable(telData, pricingData, reviewsData) {
             }
         }
 
+        const playersStr = game.pending ? 'Queued' : parseInt(game.current_players || 0).toLocaleString();
+
         tr.innerHTML = `
             <td>
                 <div class="game-info-cell">
@@ -341,7 +362,7 @@ function populateTelemetryTable(telData, pricingData, reviewsData) {
             </td>
             <td class="date-cell">${dateStr}</td>
             <td class="price-cell">${priceStr}</td>
-            <td class="player-count-cell">${parseInt(game.current_players || 0).toLocaleString()}</td>
+            <td class="player-count-cell">${playersStr}</td>
             <td>
                 <div class="reviews-cell">
                     <div class="status-indicator ${statusClass}"></div>
