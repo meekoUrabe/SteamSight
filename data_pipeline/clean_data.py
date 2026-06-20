@@ -8,6 +8,7 @@ from collect_data import collect_steam_telemetry, TARGET_GAMES
 env_path = os.path.join(os.path.dirname(__file__), '../backend/.env')
 load_dotenv(dotenv_path=env_path)
 
+DATABASE_URL = os.getenv("DATABASE_URL")
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 DB_HOST = os.getenv("DB_HOST")
@@ -15,7 +16,14 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME")
 
 def load_data_to_db():
-    engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+    if DATABASE_URL:
+        # SQLAlchemy deprecated 'postgres://', replacing with 'postgresql://' for driver compliance
+        db_url = DATABASE_URL
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        engine = create_engine(db_url)
+    else:
+        engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
     
     # 0. Dynamic Self-Healing Seed
     try:
