@@ -3,8 +3,7 @@ const ASSETS = [
     './index.html',
     './style.css',
     './script.js',
-    './icon-192.jpg',
-    './icon-512.jpg',
+    './steamsight.png',
     './manifest.json'
 ];
 
