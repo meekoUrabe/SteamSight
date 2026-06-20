@@ -1,4 +1,4 @@
-# SteamSight | SteamMetrics
+# SteamSight
 
 An end-to-end analytical data platform designed to extract, model, and visualize real-time correlations between game concurrency, pricing fluctuations, and user sentiment across targeted Steam titles.
 

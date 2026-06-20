@@ -1,6 +1,6 @@
 {
-  "name": "SteamMetrics Mission Control",
-  "short_name": "SteamMetrics",
+  "name": "SteamSight Mission Control",
+  "short_name": "SteamSight",
   "description": "Real-time Steam Player Telemetry, Pricing & Sentiment tracker.",
   "start_url": "./index.html",
   "display": "standalone",
