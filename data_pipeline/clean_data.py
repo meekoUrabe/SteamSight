@@ -57,6 +57,8 @@ def load_data_to_db():
         print("✅ SUCCESS: Advanced pipeline complete! All tables updated.")
     except Exception as e:
         print(f"❌ Database Error: {e}")
+        import sys
+        sys.exit(1)
 
 if __name__ == "__main__":
     load_data_to_db()
