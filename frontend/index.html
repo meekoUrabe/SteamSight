@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css"/>
+    <!-- Chart.js CDN & script.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
 
@@ -149,34 +152,35 @@
         
         <div class="chart-container">
             <!-- Chart Visualization -->
-            <svg class="chart-svg" viewBox="0 0 1000 400">
-                <!-- Grid Lines -->
-                <line class="chart-grid-line" x1="0" x2="1000" y1="50" y2="50"></line>
-                <line class="chart-grid-line" x1="0" x2="1000" y1="150" y2="150"></line>
-                <line class="chart-grid-line" x1="0" x2="1000" y1="250" y2="250"></line>
-                <line class="chart-grid-line" x1="0" x2="1000" y1="350" y2="350"></line>
-                
-                <!-- Area Fill -->
-                <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="rgba(255, 255, 255, 0.1)"></stop>
-                    <stop offset="100%" stop-color="rgba(255, 255, 255, 0)"></stop>
-                </linearGradient>
-                <path d="M0,300 C100,280 150,350 250,200 S400,50 550,150 S750,250 900,100 L1000,120 L1000,400 L0,400 Z" fill="url(#areaGradient)"></path>
-                
-                <!-- Main Data Line -->
-                <path class="chart-line-main" d="M0,300 C100,280 150,350 250,200 S400,50 550,150 S750,250 900,100 L1000,120"></path>
-                
-                <!-- Floating Data Points -->
-                <circle class="neon-glow-cyan" cx="250" cy="200" fill="#ffffff" r="4"></circle>
-                <circle class="neon-glow-cyan" cx="550" cy="150" fill="#ffffff" r="4"></circle>
-                <circle class="neon-glow-cyan" cx="900" cy="100" fill="#ffffff" r="4"></circle>
-            </svg>
-            
-            <!-- Data Tooltip Mockup -->
-            <div class="glass-panel chart-tooltip">
-                <p class="tooltip-time">MAY 14, 02:00 AM</p>
-                <p class="tooltip-value">1,240,511 Players</p>
-                <p class="tooltip-meta">Avg. Price: $24.99</p>
+            <canvas id="telemetryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Secondary Analytics Grid -->
+    <div class="charts-grid">
+        <!-- Pricing History Chart -->
+        <div class="glass-panel analytics-panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Store Pricing</h3>
+                    <p class="panel-subtitle">Latest store price tracking per game (USD)</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="pricingChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Review Sentiment Chart -->
+        <div class="glass-panel analytics-panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Review Sentiment</h3>
+                    <p class="panel-subtitle">Proportion of positive vs negative reviews</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="reviewsChart"></canvas>
             </div>
         </div>
     </div>

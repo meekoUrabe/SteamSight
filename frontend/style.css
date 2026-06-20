@@ -508,6 +508,19 @@ img, svg {
     margin-bottom: 2rem;
 }
 
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+    .charts-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 .kpi-card {
     padding: var(--spacing-panel-padding);
     border-radius: var(--radius-xl);
