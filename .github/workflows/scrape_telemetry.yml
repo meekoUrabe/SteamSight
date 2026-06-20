@@ -1,0 +1,28 @@
+name: Run Steam Telemetry Scraper
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # Runs automatically every 12 hours
+  workflow_dispatch: # Allows you to manually trigger the scraper from the GitHub website
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r data_pipeline/requirements.txt
+
+      - name: Run Scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python data_pipeline/clean_data.py
