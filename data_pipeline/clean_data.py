@@ -1,17 +1,24 @@
+import os
 import pandas as pd
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 from collect_data import collect_steam_telemetry
 
-DB_USER = "postgres"
-DB_PASS = "Wenny050325"
-DB_HOST = "localhost"
-DB_NAME = "steamsight_db"
+# Load environment variables from the shared backend/.env
+env_path = os.path.join(os.path.dirname(__file__), '../backend/.env')
+load_dotenv(dotenv_path=env_path)
+
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME")
 
 def load_data_to_db():
     df = collect_steam_telemetry()
     if df.empty: return
     
-    engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}")
+    engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
     
     try:
         # 1. Load Telemetry

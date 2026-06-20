@@ -22,11 +22,10 @@ const pool = new Pool({
 app.get('/api/telemetry', async (req, res) => {
     try {
         const query = `
-            SELECT g.game_name, t.current_players, t.recorded_at 
+            SELECT DISTINCT ON (t.app_id) g.game_name, t.current_players, t.recorded_at 
             FROM telemetry t
             JOIN games g ON t.app_id = g.app_id
-            ORDER BY t.recorded_at DESC
-            LIMIT 5;
+            ORDER BY t.app_id, t.recorded_at DESC;
         `;
         const result = await pool.query(query);
         res.json(result.rows);
@@ -40,11 +39,10 @@ app.get('/api/telemetry', async (req, res) => {
 app.get('/api/pricing', async (req, res) => {
     try {
         const query = `
-            SELECT g.game_name, p.price_usd, p.discount_percent 
+            SELECT DISTINCT ON (p.app_id) g.game_name, p.price_usd, p.discount_percent 
             FROM pricing_history p 
             JOIN games g ON p.app_id = g.app_id 
-            ORDER BY p.recorded_at DESC 
-            LIMIT 5;
+            ORDER BY p.app_id, p.recorded_at DESC;
         `;
         const result = await pool.query(query);
         res.json(result.rows);
@@ -58,11 +56,10 @@ app.get('/api/pricing', async (req, res) => {
 app.get('/api/reviews', async (req, res) => {
     try {
         const query = `
-            SELECT g.game_name, r.positive_reviews, r.negative_reviews 
+            SELECT DISTINCT ON (r.app_id) g.game_name, r.positive_reviews, r.negative_reviews 
             FROM daily_reviews r 
             JOIN games g ON r.app_id = g.app_id 
-            ORDER BY r.recorded_at DESC 
-            LIMIT 5;
+            ORDER BY r.app_id, r.recorded_at DESC;
         `;
         const result = await pool.query(query);
         res.json(result.rows);
