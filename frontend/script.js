@@ -1,7 +1,7 @@
 // API Configuration: Automatically routes locally or points to your production Render backend URL.
 const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-    : 'https://steamsight-api.onrender.com';
+    : 'https://steamsight-api.onrender.com'; // CHANGE THIS to your Render backend web service URL.
 
 // Keep track of active Chart.js instances to avoid overlapping rendering bugs
 let telemetryChartInstance = null;
@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadDashboardData();
     setupRegistryForm();
     setupFilters();
-    setupSearch();
     setupCSVExport();
+    setupNavigation();
 });
 
 async function loadDashboardData() {
@@ -428,50 +428,6 @@ function setupFilters() {
     });
 }
 
-function setupSearch() {
-    const searchInput = document.querySelector('.search-input');
-    if (!searchInput) return;
-
-    searchInput.addEventListener('keyup', () => {
-        const query = searchInput.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('.data-table tbody tr');
-
-        rows.forEach(row => {
-            if (row.id === 'no-results-row') return;
-            const gameNameEl = row.querySelector('.game-name');
-            if (!gameNameEl) return;
-            const gameName = gameNameEl.innerText.toLowerCase();
-
-            if (gameName.includes(query)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-        
-        const visibleRows = Array.from(rows).filter(r => r.style.display !== 'none' && r.id !== 'no-results-row');
-        const existingNoResults = document.getElementById('no-results-row');
-        
-        if (visibleRows.length === 0) {
-            if (!existingNoResults) {
-                const tbody = document.querySelector('.data-table tbody');
-                const tr = document.createElement('tr');
-                tr.id = 'no-results-row';
-                tr.innerHTML = `
-                    <td colspan="5" style="text-align: center; color: var(--color-on-surface-variant); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
-                        🔍 No matching games found
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            }
-        } else {
-            if (existingNoResults) {
-                existingNoResults.remove();
-            }
-        }
-    });
-}
-
 function setupCSVExport() {
     const exportBtn = document.querySelector('.export-btn');
     if (!exportBtn) return;
@@ -503,6 +459,40 @@ function setupCSVExport() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    });
+}
+
+function setupNavigation() {
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navGames = document.getElementById('nav-games');
+    const pageTitle = document.getElementById('page-title');
+
+    const kpiGrid = document.querySelector('.kpi-grid');
+    const mainChart = document.querySelector('.analytics-panel');
+    const barChartsGrid = document.querySelector('.charts-grid');
+
+    if (!navDashboard || !navGames) return;
+
+    navDashboard.addEventListener('click', (e) => {
+        e.preventDefault();
+        navGames.classList.remove('active');
+        navDashboard.classList.add('active');
+        if (pageTitle) pageTitle.innerText = 'Dashboard';
+
+        if (kpiGrid) kpiGrid.style.display = 'grid';
+        if (mainChart) mainChart.style.display = 'block';
+        if (barChartsGrid) barChartsGrid.style.display = 'grid';
+    });
+
+    navGames.addEventListener('click', (e) => {
+        e.preventDefault();
+        navDashboard.classList.remove('active');
+        navGames.classList.add('active');
+        if (pageTitle) pageTitle.innerText = 'Games Registry';
+
+        if (kpiGrid) kpiGrid.style.display = 'none';
+        if (mainChart) mainChart.style.display = 'none';
+        if (barChartsGrid) barChartsGrid.style.display = 'none';
     });
 }
 
