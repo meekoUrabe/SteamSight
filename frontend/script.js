@@ -9,6 +9,14 @@ let pricingChartInstance = null;
 let reviewsChartInstance = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Register Service Worker for Progressive Web App support
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('📡 Service Worker registered on scope:', reg.scope))
+            .catch(err => console.error('❌ Service Worker registration failed:', err));
+    }
+
+    setupMobileMenu();
     await loadDashboardData();
     setupRegistryForm();
     setupFilters();
@@ -677,4 +685,37 @@ function getGameIconSvg(gameName) {
                 <line x1="18" y1="11" x2="18.01" y2="11"></line>
             </svg>`;
     }
+}
+
+function setupMobileMenu() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    if (!menuToggle || !sidebar) return;
+
+    // Create and insert backdrop if missing
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active');
+    });
+
+    backdrop.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+    });
+
+    // Automatically close sidebar when selecting navigations on mobile
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('active');
+        });
+    });
 }
