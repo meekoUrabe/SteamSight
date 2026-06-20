@@ -921,3 +921,17 @@ img, svg {
         transform: scale(0.85);
     }
 }
+
+/* Bottom Grid Layout */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 1280px) {
+    .bottom-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+}

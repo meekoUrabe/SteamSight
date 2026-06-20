@@ -1,8 +1,8 @@
 import os
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
-from collect_data import collect_steam_telemetry
+from collect_data import collect_steam_telemetry, TARGET_GAMES
 
 # Load environment variables from the shared backend/.env
 env_path = os.path.join(os.path.dirname(__file__), '../backend/.env')
@@ -15,10 +15,31 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME")
 
 def load_data_to_db():
-    df = collect_steam_telemetry()
-    if df.empty: return
-    
     engine = create_engine(f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+    
+    # 0. Dynamic Self-Healing Seed
+    try:
+        with engine.begin() as conn:
+            for game_name, app_id in TARGET_GAMES.items():
+                conn.execute(
+                    text("INSERT INTO games (app_id, game_name) VALUES (:app_id, :game_name) ON CONFLICT (app_id) DO NOTHING"),
+                    {"app_id": int(app_id), "game_name": game_name}
+                )
+    except Exception as e:
+        print(f"⚠️ Seeding Warning: {e}")
+
+    # Fetch tracked games list from DB
+    db_games = None
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT app_id, game_name FROM games"))
+            db_games = {row[1]: str(row[0]) for row in result.fetchall()}
+            print(f"📡 Dynamically fetched {len(db_games)} games from database registry.")
+    except Exception as e:
+        print(f"⚠️ Failed to fetch games from DB, using defaults: {e}")
+        
+    df = collect_steam_telemetry(db_games)
+    if df.empty: return
     
     try:
         # 1. Load Telemetry

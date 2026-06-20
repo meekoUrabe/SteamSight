@@ -140,8 +140,8 @@
     <div class="glass-panel analytics-panel">
         <div class="panel-header">
             <div>
-                <h3 class="panel-title">Global Player Telemetry vs Price</h3>
-                <p class="panel-subtitle">Real-time correlation analysis across top 1,000 titles</p>
+                <h3 class="panel-title">Historical Player Trends</h3>
+                <p class="panel-subtitle">7-Day player concurrency history tracking</p>
             </div>
             <div class="filter-tabs">
                 <button class="tab-btn active">24H</button>
@@ -185,103 +185,55 @@
         </div>
     </div>
 
-    <!-- Recent Telemetry Data Table -->
-    <div class="glass-panel table-panel">
-        <div class="table-header-bar">
-            <h4 class="table-title">Recent Telemetry Data</h4>
-            <button class="export-btn">Export CSV</button>
+    <!-- Bottom Grid (Table & Registry) -->
+    <div class="bottom-grid">
+        <!-- Recent Telemetry Data Table -->
+        <div class="glass-panel table-panel">
+            <div class="table-header-bar">
+                <h4 class="table-title">Recent Telemetry Data</h4>
+                <button class="export-btn">Export CSV</button>
+            </div>
+            
+            <div class="table-responsive custom-scrollbar">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Game Name</th>
+                            <th>Date</th>
+                            <th>Price</th>
+                            <th class="text-right">Player Count</th>
+                            <th>Reviews</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--color-on-surface-variant); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
+                                📡 Awaiting Telemetry Connection...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        
-        <div class="table-responsive custom-scrollbar">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Game Name</th>
-                        <th>Date</th>
-                        <th>Price</th>
-                        <th class="text-right">Player Count</th>
-                        <th>Reviews</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <div class="game-info-cell">
-                                <div class="game-icon">
-                                    <img class="game-icon-img" data-alt="A futuristic sci-fi game icon featuring a glowing minimalist portal in neon blue and deep violet, digital art style, sharp vector edges." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCi77LAVsQAK8OvLJcenTYLiTt_nSsWjq5qOVVN7HJHgbS2TbCsEFRSKD6SRYD3S0aD8qzyeKf8tY4C6ssxsT61zuUSpKgFqlIPrtrE6c5E0u-5OMjty6xyGlOim56k_WjkUqR4QfOQN0IIm64roXv8F436namgX5azGMbfKkWg3-peHfsSV5zpym6_YOZqhD7uTHW-aBYyYLVQJuYGF30_Gb22S9DyfEhPrrX7v-PTBADQjEdN1Y3dLiS-punxq_QFM_ZWwLrYtc"/>
-                                </div>
-                                <span class="game-name">Neon Abyss: Rebirth</span>
-                            </div>
-                        </td>
-                        <td class="date-cell">May 16, 2024</td>
-                        <td class="price-cell">$29.99</td>
-                        <td class="player-count-cell">42,891</td>
-                        <td>
-                            <div class="reviews-cell">
-                                <div class="status-indicator positive"></div>
-                                <span class="reviews-text">92% Positive</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="game-info-cell">
-                                <div class="game-icon">
-                                    <img class="game-icon-img" data-alt="A dark tactical combat game logo, a stylized metal skull with cybernetic eye implants glowing orange, cinematic 3D render, dark metallic texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgGfSY3tYF6Fi0BXn4K0_GO0DZp1wzoJcMpISkw9fYqAApp6CCytvRp5X_NvS7IUJxCjaSPJpk8i-AL6DwIJoCJony0LorcfFE7xeESrIKcX_DsQuD9dI7CogAC1FAcxOFuX416idoJ31CEukR3U17ql03huuBrg_-MOXb75ZxkxIAlGR-n270nkQSFYocrGp2S_eGwqUu4qfJWSg8GLMB-iSuk5myB0kL5016OG6IJeCdPjP5TJP28prOpTgo50qpYZdxHZd6Ctk"/>
-                                </div>
-                                <span class="game-name">Protocol: Void</span>
-                            </div>
-                        </td>
-                        <td class="date-cell">May 16, 2024</td>
-                        <td class="price-cell">$59.99</td>
-                        <td class="player-count-cell">105,422</td>
-                        <td>
-                            <div class="reviews-cell">
-                                <div class="status-indicator positive"></div>
-                                <span class="reviews-text">88% Positive</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="game-info-cell">
-                                <div class="game-icon">
-                                    <img class="game-icon-img" data-alt="A whimsical space exploration game cover showing a colorful stylized nebula and a small white astronaut silhouette, vibrant colors, painterly digital art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf2jBkB_VnYR496LveCS1Hyh77nBz2xgPHqDXQQFw4JQnAi5SqU7ish1oc9nSJvrytybimNL6gl82W2xfO6ASY3YdEKRUlSxG8adGaykR4Fh957xTMUgGITbJzn5JlyacNVtMJxXFMIhnTON7exvyHY-xH6CAanz6AN0b-Yt83kgn2beyPJTtpxDvlOknsRPfx55F3EMYI71tCeFaNka5kywzbWtrjH-WAIkthuxKwe1J1Wn5bz1-Tv_yAZofs31a2CH79F98DncM"/>
-                                </div>
-                                <span class="game-name">Stellar Drift</span>
-                            </div>
-                        </td>
-                        <td class="date-cell">May 15, 2024</td>
-                        <td class="price-cell">Free to Play</td>
-                        <td class="player-count-cell">312,005</td>
-                        <td>
-                            <div class="reviews-cell">
-                                <div class="status-indicator mixed"></div>
-                                <span class="reviews-text">Mixed (64%)</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="game-info-cell">
-                                <div class="game-icon">
-                                    <img class="game-icon-img" data-alt="A dark fantasy dungeon game icon, glowing green runes carved into dark obsidian rock, moody lighting, emerald glowing highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtmuZZEx3GcmheTpJvAd_N6EyVYCTWRtL9mseWLT06m9DKo6kNXtEhI-4xb6lOqwV4nej6T7c1iPbOdhpqA-gJ9Eczw28uOxMyYi2tfp2N0iBzVlEJv_sxag4FSI22VCIY971v50PnJ8_PR_8iaci6LsN3-5LPuHv2JyqY6SE_SQ3Is861YuwJJkwXwhKw_Q3BKSY6NggU_hMWDROYvLQSR6ScFDN_gsNsC822p-VyHTDnmER-EZrMMlR9fB6NfwkPXEV-zMx8Z9Q"/>
-                                </div>
-                                <span class="game-name">Crypt Hunter XL</span>
-                            </div>
-                        </td>
-                        <td class="date-cell">May 15, 2024</td>
-                        <td class="price-cell">$14.99</td>
-                        <td class="player-count-cell">12,190</td>
-                        <td>
-                            <div class="reviews-cell">
-                                <div class="status-indicator positive"></div>
-                                <span class="reviews-text">Very Positive</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <!-- Track Game Registry (Right Column) -->
+        <div class="glass-panel registry-panel" style="padding: var(--spacing-panel-padding); border-radius: var(--radius-xl);">
+            <div class="panel-header" style="margin-bottom: 1.5rem;">
+                <h4 class="table-title">Register Game</h4>
+                <p class="panel-subtitle" style="font-size: 11px; margin-top: 0.25rem;">Track new Steam titles automatically</p>
+            </div>
+            <form id="add-game-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="input-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--color-on-surface-variant); font-weight: 500; text-transform: uppercase;">STEAM APP ID</label>
+                    <input type="number" id="reg-app-id" placeholder="e.g. 1091500" required style="background: rgba(0, 0, 0, 0.4); border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--color-on-surface); font-size: 0.875rem; padding: 0.5rem; border-radius: var(--radius-sm);" />
+                </div>
+                <div class="input-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--color-on-surface-variant); font-weight: 500; text-transform: uppercase;">GAME TITLE</label>
+                    <input type="text" id="reg-game-name" placeholder="e.g. Cyberpunk 2077" required style="background: rgba(0, 0, 0, 0.4); border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--color-on-surface); font-size: 0.875rem; padding: 0.5rem; border-radius: var(--radius-sm);" />
+                </div>
+                <button type="submit" style="background: #ffffff; color: #000000; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: bold; padding: 0.75rem; border-radius: var(--radius-md); text-align: center; text-transform: uppercase; margin-top: 0.5rem; transition: background 0.3s; cursor: pointer;">Register Title</button>
+            </form>
+            <div id="registration-feedback" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; text-align: center; display: none; margin-top: 1rem;"></div>
         </div>
     </div>
 </main>
