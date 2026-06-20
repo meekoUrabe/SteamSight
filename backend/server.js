@@ -40,7 +40,7 @@ async function initializeDatabase() {
 app.get('/api/telemetry', async (req, res) => {
     try {
         const query = `
-            SELECT game_name, current_players, recorded_at
+            SELECT game_name, current_players, recorded_at, app_id
             FROM (
                 SELECT DISTINCT ON (t.app_id) g.game_name, t.current_players, t.recorded_at, t.app_id
                 FROM telemetry t
@@ -61,7 +61,7 @@ app.get('/api/telemetry', async (req, res) => {
 app.get('/api/pricing', async (req, res) => {
     try {
         const query = `
-            SELECT game_name, price_usd, discount_percent
+            SELECT game_name, price_usd, discount_percent, app_id
             FROM (
                 SELECT DISTINCT ON (p.app_id) g.game_name, p.price_usd, p.discount_percent, p.app_id
                 FROM pricing_history p 
@@ -82,7 +82,7 @@ app.get('/api/pricing', async (req, res) => {
 app.get('/api/reviews', async (req, res) => {
     try {
         const query = `
-            SELECT game_name, positive_reviews, negative_reviews
+            SELECT game_name, positive_reviews, negative_reviews, app_id
             FROM (
                 SELECT DISTINCT ON (r.app_id) g.game_name, r.positive_reviews, r.negative_reviews, r.app_id
                 FROM daily_reviews r 

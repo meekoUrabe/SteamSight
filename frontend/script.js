@@ -270,6 +270,7 @@ function populateTelemetryTable(telData, pricingData, reviewsData, allGames) {
     // Seed all games from registry first to identify pending scraper states
     allGames.forEach(game => {
         merged[game.game_name] = {
+            app_id: game.app_id,
             game_name: game.game_name,
             recorded_at: null,
             current_players: 0,
@@ -283,30 +284,81 @@ function populateTelemetryTable(telData, pricingData, reviewsData, allGames) {
 
     // Populate with actual telemetry values if they exist
     telData.forEach(item => {
-        if (merged[item.game_name]) {
+        if (!merged[item.game_name]) {
+            merged[item.game_name] = {
+                app_id: item.app_id,
+                game_name: item.game_name,
+                recorded_at: item.recorded_at,
+                current_players: item.current_players,
+                price_usd: 0.0,
+                discount_percent: 0,
+                positive_reviews: 0,
+                negative_reviews: 0,
+                pending: false
+            };
+        } else {
             merged[item.game_name].recorded_at = item.recorded_at;
             merged[item.game_name].current_players = item.current_players;
             merged[item.game_name].pending = false;
+            if (item.app_id && !merged[item.game_name].app_id) {
+                merged[item.game_name].app_id = item.app_id;
+            }
         }
     });
 
     pricingData.forEach(item => {
-        if (merged[item.game_name]) {
+        if (!merged[item.game_name]) {
+            merged[item.game_name] = {
+                app_id: item.app_id,
+                game_name: item.game_name,
+                recorded_at: null,
+                current_players: 0,
+                price_usd: parseFloat(item.price_usd),
+                discount_percent: parseInt(item.discount_percent || 0),
+                positive_reviews: 0,
+                negative_reviews: 0,
+                pending: false
+            };
+        } else {
             merged[item.game_name].price_usd = parseFloat(item.price_usd);
             merged[item.game_name].discount_percent = parseInt(item.discount_percent || 0);
+            if (item.app_id && !merged[item.game_name].app_id) {
+                merged[item.game_name].app_id = item.app_id;
+            }
         }
     });
 
     reviewsData.forEach(item => {
-        if (merged[item.game_name]) {
+        if (!merged[item.game_name]) {
+            merged[item.game_name] = {
+                app_id: item.app_id,
+                game_name: item.game_name,
+                recorded_at: null,
+                current_players: 0,
+                price_usd: 0.0,
+                discount_percent: 0,
+                positive_reviews: parseInt(item.positive_reviews || 0),
+                negative_reviews: parseInt(item.negative_reviews || 0),
+                pending: false
+            };
+        } else {
             merged[item.game_name].positive_reviews = parseInt(item.positive_reviews || 0);
             merged[item.game_name].negative_reviews = parseInt(item.negative_reviews || 0);
+            if (item.app_id && !merged[item.game_name].app_id) {
+                merged[item.game_name].app_id = item.app_id;
+            }
         }
     });
 
     Object.values(merged).forEach(game => {
         const tr = document.createElement('tr');
         const iconSvg = getGameIconSvg(game.game_name);
+        let iconHtml = iconSvg;
+        if (game.app_id) {
+            const imgUrl = `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.app_id}/capsule_184x69.jpg`;
+            const escapedSvg = iconSvg.replace(/'/g, "\\'");
+            iconHtml = `<img src="${imgUrl}" class="game-icon-img" alt="${game.game_name}" onerror="this.onerror=null; this.outerHTML='${escapedSvg}';" />`;
+        }
 
         let dateStr = 'Unknown';
         if (game.recorded_at) {
@@ -355,7 +407,7 @@ function populateTelemetryTable(telData, pricingData, reviewsData, allGames) {
             <td>
                 <div class="game-info-cell">
                     <div class="game-icon">
-                        ${iconSvg}
+                        ${iconHtml}
                     </div>
                     <span class="game-name">${game.game_name}</span>
                 </div>
