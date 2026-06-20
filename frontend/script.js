@@ -356,8 +356,8 @@ function populateTelemetryTable(telData, pricingData, reviewsData, allGames) {
         let iconHtml = iconSvg;
         if (game.app_id) {
             const imgUrl = `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.app_id}/capsule_184x69.jpg`;
-            const escapedSvg = iconSvg.replace(/'/g, "\\'");
-            iconHtml = `<img src="${imgUrl}" class="game-icon-img" alt="${game.game_name}" onerror="this.onerror=null; this.outerHTML='${escapedSvg}';" />`;
+            const encodedSvg = encodeURIComponent(iconSvg);
+            iconHtml = `<img src="${imgUrl}" class="game-icon-img" alt="${game.game_name}" onerror="this.onerror=null; this.outerHTML=decodeURIComponent('${encodedSvg}');" />`;
         }
 
         let dateStr = 'Unknown';
